@@ -1,0 +1,6 @@
+target/
+build/
+.maven-repo/
+runtime/
+*.zip
+src/main/resources/db-local.properties

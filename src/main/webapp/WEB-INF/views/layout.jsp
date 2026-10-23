@@ -1,0 +1,10 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" scope="request"/>
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CollabHub · Student Project Collaboration</title><link rel="stylesheet" href="${ctx}/assets/css/style.css"><script src="${ctx}/assets/js/app.js" defer></script></head>
+<body><header class="site-header"><div class="nav-wrap"><a class="brand" href="${ctx}/home"><span class="brand-icon">C</span>Collab<span>Hub</span></a><nav aria-label="Main navigation">
+<c:choose><c:when test="${not empty sessionScope.user}"><a href="${ctx}/dashboard">Dashboard</a><a href="${ctx}/projects">Projects</a><a href="${ctx}/students">Find teammates</a><a href="${ctx}/tasks">My tasks</a><a href="${ctx}/notifications">Notifications <span class="count"><c:out value="${unread}"/></span></a><a href="${ctx}/leaderboard">Leaderboard</a><a href="${ctx}/profile">Profile</a><c:if test="${sessionScope.user.admin}"><a href="${ctx}/admin/dashboard">Admin</a></c:if><form action="${ctx}/logout" method="post" class="inline"><%@ include file="parts/csrf.jspf" %><button class="link-button">Log out</button></form></c:when><c:otherwise><a href="${ctx}/home">Home</a><a href="${ctx}/login">Sign in</a></c:otherwise></c:choose>
+</nav></div></header>
+<main class="container"><c:if test="${not empty sessionScope.success}"><div class="alert success" role="status"><c:out value="${sessionScope.success}"/></div><c:remove var="success" scope="session"/></c:if><c:if test="${not empty sessionScope.error}"><div class="alert error" role="alert"><c:out value="${sessionScope.error}"/></div><c:remove var="error" scope="session"/></c:if>
+<jsp:include page="${page}.jsp"/>
+</main><footer><div class="container footer-inner"><span class="brand">CollabHub</span><span>A space to build, learn, and achieve together.</span><span>Student Project Collaboration Hub</span></div></footer></body></html>

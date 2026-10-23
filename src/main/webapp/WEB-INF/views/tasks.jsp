@@ -1,0 +1,2 @@
+<%@ page contentType="text/html; charset=UTF-8" %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<div class="page-heading"><div><p class="eyebrow">ONE STEP AT A TIME</p><h1>My tasks</h1><p>Your assigned work across every project. Open a project to create or edit tasks.</p></div><a class="button secondary" href="${ctx}/dashboard">My projects</a></div><%@ include file="parts/task-list.jspf" %>
