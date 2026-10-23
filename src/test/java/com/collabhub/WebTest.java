@@ -93,7 +93,7 @@ public class WebTest {
   @Test
   public void httpWorkflowAndEveryPage() throws Exception {
     Assume.assumeTrue("true".equals(System.getenv("COLLABHUB_INTEGRATION")));
-    assertTrue(System.getenv("DB_URL").contains("/student_hub_test?"));
+    com.collabhub.util.TestDatabase.requireIsolated();
     String suffix = UUID.randomUUID().toString(),
         emailA = "web-a" + suffix + "@example.test",
         emailB = "web-b" + suffix + "@example.test",
@@ -115,6 +115,23 @@ public class WebTest {
       assertEquals(302, ca.status);
       ca.call("POST", "/register", "name=forged");
       assertEquals(403, ca.status);
+      Client registration = new Client();
+      registration.get("/register");
+      String registeredEmail = "http-registration-" + suffix + "@example.test";
+      registration.post(
+          "/register",
+          "name",
+          "HTTP Registration",
+          "email",
+          registeredEmail,
+          "password",
+          PASSWORD,
+          "confirmPassword",
+          PASSWORD);
+      assertEquals(302, registration.status);
+      registration.login(registeredEmail);
+      registration.get("/profile");
+      assertTrue(registration.body.contains(registeredEmail));
       ca.login(emailA);
       cb.login(emailB);
       cc.login(emailC);
@@ -190,7 +207,7 @@ public class WebTest {
                   + project
                   + "\r\n--"
                   + boundary
-                  + "\r\nContent-Disposition: form-data; name=\"file\"; filename=\"verification.txt\"\r\nContent-Type: text/plain\r\n\r\nVerified private file\r\n--"
+                  + "\r\nContent-Disposition: form-data; name=\"file\"; filename=\"verification.txt\"\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\nVerified private file\r\n--"
                   + boundary
                   + "--\r\n";
       cb.call(
@@ -229,7 +246,9 @@ public class WebTest {
       }
       ca.get("/admin/dashboard");
       assertEquals(ca.body, 200, ca.status);
-      ca.post("/admin/announcement", "message", "Integration announcement");
+      ca.post("/admin/announcement", "message", String.join("", Collections.nCopies(1000, "a")));
+      ca.get("/dashboard");
+      assertTrue(ca.body.contains(String.join("", Collections.nCopies(1000, "a"))));
       ca.post("/admin/student", "id", outsider + "", "active", "false");
       cc.get("/dashboard");
       assertEquals(302, cc.status);
@@ -241,6 +260,11 @@ public class WebTest {
       cb.get("/project-details?id=" + project);
       assertEquals(200, cb.status);
       assertTrue(cb.body.contains(emailB));
+      ca.post("/project-delete", "id", project + "");
+      cb.get("/tasks");
+      assertEquals(200, cb.status);
+      assertTrue(cb.body.contains("Tasks are read-only"));
+      assertFalse(cb.body.contains("action=\"/Student_Collaboration_Hub/task-status\""));
     } finally {
       server.stop();
       server.destroy();

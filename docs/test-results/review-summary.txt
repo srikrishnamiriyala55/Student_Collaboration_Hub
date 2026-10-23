@@ -1,0 +1,9 @@
+Source review verification: 23 October 2026
+Maven package: PASS
+Database-independent tests: 8 passed; 8 opt-in cases skipped
+Jasper JSP compilation: 17 pages, 0 errors
+ReviewRunner: 7 tests, 0 failures, 0 skipped
+ReviewRunner with useAffectedRows=true: 7 tests, 0 failures, 0 skipped
+PowerShell syntax checks: PASS
+Temporary review schemas removed after both executions.
+student_hub_test was not recreated; application data was not used for tests.

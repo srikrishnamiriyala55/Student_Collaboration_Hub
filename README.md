@@ -94,6 +94,7 @@ Student_Collaboration_Hub/
 │   └── test-integration.ps1                   # Explicitly initializes a separate test database and runs integration tests.
 ├── docs/                                      # Contains implementation notes, testing instructions, and verification records.
 │   ├── ARCHITECTURE.md                        # Maps features to routes, DAOs, tables, transactions, and scoring rules.
+│   ├── CODE_REVIEW.md                         # Records reviewed bugs, corrections, and regression verification.
 │   ├── TESTING.md                             # Describes automated tests and practical acceptance checks.
 │   ├── VERIFICATION.md                        # Records completed verification and its environment and limitations.
 │   └── test-results/                          # Contains saved test reports from documented verification runs.
@@ -161,9 +162,15 @@ Student_Collaboration_Hub/
 │       ├── DevServer.java                     # Starts embedded Tomcat with the application resources and classes.
 │       ├── InitializeTestDb.java              # Initializes the isolated schema used by explicit integration tests.
 │       ├── WorkflowTest.java                  # Tests database workflows, permissions, concurrency, and rollback.
+│       ├── RegressionTest.java                # Tests announcement limits, password boundaries, idempotency, and team capacity.
 │       ├── WebTest.java                       # Tests real HTTP sessions, rendered pages, forms, and file access.
 │       ├── JspCompilationTest.java            # Compiles all JSP pages and fragments without a database.
-│       └── util/DatabaseInitializerTest.java   # Tests setup safety and optional real first-run data preservation.
+│       ├── servlet/FileServletTest.java       # Tests default upload storage without a Tomcat base directory.
+│       └── util/                              # Contains configuration, validation, and isolated-database test helpers.
+│           ├── DatabaseInitializerTest.java   # Tests setup safety and optional real first-run data preservation.
+│           ├── ValidationTest.java            # Tests Unicode previews, password byte limits, and invalid dates.
+│           ├── TestDatabase.java              # Restricts integration execution to explicitly isolated database names.
+│           └── ReviewRunner.java              # Runs MySQL/HTTP regressions in a disposable schema and removes it afterward.
 ├── target/                                    # Generated Maven output containing compiled classes, WAR, and test reports.
 ├── runtime/                                   # Generated local Tomcat files and uploads excluded from Git.
 ├── .maven-repo/                               # Local dependency cache created by the helper scripts and excluded from Git.

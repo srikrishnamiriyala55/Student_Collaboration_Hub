@@ -1,7 +1,12 @@
+param([string]$TestDatabaseUrl = 'jdbc:mysql://127.0.0.1:3306/student_hub_test?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC')
 $ErrorActionPreference = 'Stop'
 Set-Location -LiteralPath (Split-Path -Parent $PSScriptRoot)
 if (-not $env:DB_PASSWORD) { throw 'Set DB_PASSWORD for your local MySQL root account first.' }
-$env:DB_URL='jdbc:mysql://127.0.0.1:3306/student_hub_test?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC'
+$collabPreviousEnvironment=@{}
+foreach($name in @('DB_URL','UPLOAD_DIR','COLLABHUB_INTEGRATION')) {
+    $collabPreviousEnvironment[$name]=[Environment]::GetEnvironmentVariable($name,'Process')
+}
+$env:DB_URL=$TestDatabaseUrl
 $env:UPLOAD_DIR=Join-Path $PWD 'runtime\test-uploads'
 $env:COLLABHUB_INTEGRATION='true'
 try {
@@ -13,5 +18,7 @@ try {
     mvn "-Dmaven.repo.local=$PWD\.maven-repo" test
     if ($LASTEXITCODE -ne 0) { throw 'Integration tests failed. See target/surefire-reports.' }
 } finally {
-    Remove-Item Env:DB_URL,Env:UPLOAD_DIR,Env:COLLABHUB_INTEGRATION -ErrorAction SilentlyContinue
+    foreach($name in $collabPreviousEnvironment.Keys) {
+        [Environment]::SetEnvironmentVariable($name,$collabPreviousEnvironment[$name],'Process')
+    }
 }

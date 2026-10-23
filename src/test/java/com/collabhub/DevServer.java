@@ -28,7 +28,8 @@ public final class DevServer {
     if (!tomcat.getConnector().getState().isAvailable() || !context.getState().isAvailable()) {
       tomcat.stop();
       tomcat.destroy();
-      throw new IllegalStateException("Application startup failed. Check the HTTP port and database initialization logs.");
+      throw new IllegalStateException(
+          "Application startup failed. Check the HTTP port and database initialization logs.");
     }
     return tomcat;
   }

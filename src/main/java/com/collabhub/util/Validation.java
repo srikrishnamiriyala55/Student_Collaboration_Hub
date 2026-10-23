@@ -26,6 +26,18 @@ public final class Validation {
     throw new IllegalArgumentException("Invalid selection.");
   }
 
+  public static String preview(String value, int max) {
+    require(value != null && max > 0, "Invalid notification text.");
+    if (value.codePointCount(0, value.length()) <= max) return value;
+    return value.substring(0, value.offsetByCodePoints(0, max - 1)) + "…";
+  }
+
+  public static boolean validPasswordLength(String password) {
+    return password != null
+        && password.length() >= 8
+        && password.getBytes(java.nio.charset.StandardCharsets.UTF_8).length <= 72;
+  }
+
   public static long id(String value) {
     try {
       long id = Long.parseLong(value);

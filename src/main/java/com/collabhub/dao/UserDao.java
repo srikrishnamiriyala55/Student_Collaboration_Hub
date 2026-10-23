@@ -15,7 +15,7 @@ public class UserDao {
         e = Validation.text(email, "Email", 190).toLowerCase(Locale.ROOT);
     Validation.require(e.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"), "Enter a valid email address.");
     Validation.require(
-        password != null && password.length() >= 8 && password.getBytes("UTF-8").length <= 72,
+        Validation.validPasswordLength(password),
         "Password must be at least 8 characters and at most 72 UTF-8 bytes.");
     Validation.require(password.equals(confirmation), "Passwords do not match.");
     String hash = BCrypt.hashpw(password, BCrypt.gensalt(12));
@@ -28,6 +28,9 @@ public class UserDao {
   }
 
   public User login(String email, String password) throws Exception {
+    Validation.require(
+        Validation.validPasswordLength(password),
+        "Email or password is incorrect, or the account is inactive.");
     try (Connection c = Db.open()) {
       Record r =
           Sql.one(

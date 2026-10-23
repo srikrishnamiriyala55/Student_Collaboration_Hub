@@ -15,11 +15,15 @@ import javax.servlet.http.*;
 @MultipartConfig(maxFileSize = 10485760, maxRequestSize = 11000000, fileSizeThreshold = 0)
 public class FileServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
+
   private Path root() throws IOException {
     String configured = System.getenv("UPLOAD_DIR");
+    String base = System.getProperty("catalina.base");
     Path p =
-        configured == null
-            ? Paths.get(System.getProperty("catalina.base"), "collabhub-uploads")
+        configured == null || configured.trim().isEmpty()
+            ? (base == null
+                ? Paths.get("runtime", "uploads")
+                : Paths.get(base, "collabhub-uploads"))
             : Paths.get(configured);
     p = p.toAbsolutePath().normalize();
     Files.createDirectories(p);
@@ -63,6 +67,7 @@ public class FileServlet extends HttpServlet {
       String type = types.get(ext);
       Validation.require(type != null, "Allowed files: PDF, PNG, JPG, TXT, CSV.");
       String supplied = part.getContentType();
+      if (supplied != null) supplied = supplied.split(";", 2)[0].trim().toLowerCase(Locale.ROOT);
       Validation.require(
           type.equals(supplied)
               || (ext.equals("csv") && "application/vnd.ms-excel".equals(supplied)),
@@ -88,7 +93,13 @@ public class FileServlet extends HttpServlet {
       getServletContext().log("Upload failed", e);
       r.getSession().setAttribute("error", "Unable to upload this file.");
     } finally {
-      if (saved != null) Files.deleteIfExists(saved);
+      if (saved != null) {
+        try {
+          Files.deleteIfExists(saved);
+        } catch (IOException cleanupFailure) {
+          getServletContext().log("Unable to clean up an uncommitted upload", cleanupFailure);
+        }
+      }
     }
     s.sendRedirect(
         r.getContextPath() + (project > 0 ? "/project-details?id=" + project : "/dashboard"));
@@ -145,7 +156,7 @@ public class FileServlet extends HttpServlet {
       s.sendError(403, "File not found or access denied.");
     } catch (Exception e) {
       getServletContext().log("Download failed", e);
-      s.sendError(503);
+      if (!s.isCommitted()) s.sendError(503);
     }
   }
 }

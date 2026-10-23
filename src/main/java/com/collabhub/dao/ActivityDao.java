@@ -21,7 +21,7 @@ public final class ActivityDao {
         c,
         "INSERT INTO notifications(recipient_id,message,type,project_id,request_id) VALUES(?,?,?,?,?)",
         user,
-        message,
+        com.collabhub.util.Validation.preview(message, 600),
         type,
         project == 0 ? null : project,
         request);

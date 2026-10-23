@@ -27,11 +27,17 @@ public class CommunityDao {
     try (Connection c = Db.open()) {
       Validation.require(
           Sql.update(
-                  c,
-                  "UPDATE notifications SET is_read=TRUE WHERE id=? AND recipient_id=?",
-                  notification,
-                  user)
-              == 1,
+                      c,
+                      "UPDATE notifications SET is_read=TRUE WHERE id=? AND recipient_id=?",
+                      notification,
+                      user)
+                  == 1
+              || Sql.one(
+                      c,
+                      "SELECT id FROM notifications WHERE id=? AND recipient_id=?",
+                      notification,
+                      user)
+                  != null,
           "Notification not found.");
     }
   }

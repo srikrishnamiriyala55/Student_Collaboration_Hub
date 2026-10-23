@@ -21,9 +21,11 @@ public final class DatabaseInitializer {
 
   static String[] target(String url) {
     Matcher match = URL.matcher(url == null ? "" : url);
-    Validation.require(match.matches(),
+    Validation.require(
+        match.matches(),
         "DB_URL must use jdbc:mysql://host:port/database with a simple database name.");
-    Validation.require(match.group(2).length() <= 64, "Database names must be at most 64 characters.");
+    Validation.require(
+        match.group(2).length() <= 64, "Database names must be at most 64 characters.");
     return new String[] {
       match.group(1) + (match.group(3) == null ? "" : match.group(3)), match.group(2)
     };
@@ -57,8 +59,9 @@ public final class DatabaseInitializer {
 
   public static synchronized void initialize(String url) throws Exception {
     String[] target = target(url);
-    String lock = "collabhub:init:" + java.util.UUID.nameUUIDFromBytes(
-        target[1].getBytes(StandardCharsets.UTF_8));
+    String lock =
+        "collabhub:init:"
+            + java.util.UUID.nameUUIDFromBytes(target[1].getBytes(StandardCharsets.UTF_8));
     // Connect without a database so first-run setup also works when it does not yet exist.
     try (Connection connection = Db.connect(target[0]);
         PreparedStatement acquire = connection.prepareStatement("SELECT GET_LOCK(?,30)")) {

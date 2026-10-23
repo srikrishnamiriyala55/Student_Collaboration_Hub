@@ -14,7 +14,8 @@ public class DatabaseStartupListener implements ServletContextListener {
     } catch (Exception e) {
       event.getServletContext().log("CollabHub database initialization failed.", e);
       throw new IllegalStateException(
-          "Database startup failed. Verify MySQL is running, credentials are correct, and the account has CREATE privileges.", e);
+          "Database startup failed. Verify MySQL is running, credentials are correct, and the account has CREATE privileges.",
+          e);
     }
   }
 

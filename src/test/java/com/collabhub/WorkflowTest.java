@@ -24,10 +24,7 @@ public class WorkflowTest {
     Assume.assumeTrue(
         "Set COLLABHUB_INTEGRATION=true to run MySQL integration tests",
         "true".equals(System.getenv("COLLABHUB_INTEGRATION")));
-    String url = System.getenv("DB_URL");
-    assertNotNull(url);
-    assertTrue(
-        "Tests require the isolated student_hub_test database", url.contains("/student_hub_test?"));
+    com.collabhub.util.TestDatabase.requireIsolated();
     String suffix = UUID.randomUUID().toString();
     a = student("Owner " + suffix, "a" + suffix);
     b = student("Member " + suffix, "b" + suffix);

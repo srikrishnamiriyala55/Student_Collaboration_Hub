@@ -294,7 +294,10 @@ public class AppServlet extends HttpServlet {
           next = "/profile";
           break;
         case "/admin/student":
-          admin.active(u, id(r, "id"), "true".equals(r.getParameter("active")));
+          admin.active(
+              u,
+              id(r, "id"),
+              "true".equals(Validation.choice(r.getParameter("active"), "true", "false")));
           next = "/admin/dashboard";
           break;
         case "/admin/announcement":
@@ -315,7 +318,7 @@ public class AppServlet extends HttpServlet {
       r.getSession()
           .setAttribute(
               "error",
-              "Unable to complete the action. Please try again. No partial database changes were saved.");
+              "Unable to complete the action. Reload the page to check its current state before trying again.");
       redirect(r, s, errorTarget(path));
     }
   }

@@ -10,7 +10,7 @@ public class TaskDao {
   public List<Record> list(User user, Long project) throws Exception {
     try (Connection c = Db.open()) {
       String sql =
-          "SELECT t.*,s.name assignee_name,p.title project_title FROM tasks t JOIN students s ON s.id=t.assignee_id JOIN projects p ON p.id=t.project_id ";
+          "SELECT t.*,s.name assignee_name,p.title project_title,p.status project_status FROM tasks t JOIN students s ON s.id=t.assignee_id JOIN projects p ON p.id=t.project_id ";
       if (project != null) {
         ProjectDao.authorize(c, project, user, false);
         return Sql.list(
@@ -44,6 +44,9 @@ public class TaskDao {
           ProjectDao.writable(p);
           Validation.require(
               ProjectDao.member(c, project, assignee), "Assignee must belong to the project.");
+          Validation.require(
+              Sql.one(c, "SELECT id FROM students WHERE id=? AND active=TRUE", assignee) != null,
+              "Assignee must have an active account.");
           if (id == 0)
             Sql.insert(
                 c,
@@ -99,6 +102,7 @@ public class TaskDao {
           ProjectDao.authorize(c, project, user, false);
           ProjectDao.writable(p);
           Record t = Sql.one(c, "SELECT * FROM tasks WHERE id=? FOR UPDATE", task);
+          if (status.equals(t.text("status"))) return null;
           Sql.update(c, "UPDATE tasks SET status=? WHERE id=?", status, task);
           if ("COMPLETED".equals(status)) ActivityDao.badge(c, t.id("assignee_id"), "FINISHER");
           ActivityDao.notify(

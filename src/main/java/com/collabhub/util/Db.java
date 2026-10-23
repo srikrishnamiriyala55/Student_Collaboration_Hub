@@ -1,6 +1,8 @@
 package com.collabhub.util;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.Properties;
 
@@ -12,7 +14,7 @@ public final class Db {
       Class.forName("com.mysql.cj.jdbc.Driver");
       for (String file : new String[] {"db.properties", "db-local.properties"}) {
         try (InputStream in = Db.class.getClassLoader().getResourceAsStream(file)) {
-          if (in != null) CONFIG.load(in);
+          if (in != null) CONFIG.load(new InputStreamReader(in, StandardCharsets.UTF_8));
         }
       }
     } catch (Exception e) {
@@ -48,13 +50,20 @@ public final class Db {
 
   public static <T> T transaction(Work<T> work) throws Exception {
     try (Connection c = open()) {
+      // Project locks serialize membership changes; later reads must see the latest committed
+      // count.
+      c.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
       c.setAutoCommit(false);
       try {
         T result = work.run(c);
         c.commit();
         return result;
       } catch (Exception e) {
-        c.rollback();
+        try {
+          c.rollback();
+        } catch (SQLException rollbackFailure) {
+          e.addSuppressed(rollbackFailure);
+        }
         throw e;
       }
     }
