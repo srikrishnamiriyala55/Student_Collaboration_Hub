@@ -25,10 +25,10 @@ public final class DevServer {
         (org.apache.tomcat.util.scan.StandardJarScanner) context.getJarScanner();
     scanner.setScanClassPath(true);
     tomcat.start();
-    if (!tomcat.getConnector().getState().isAvailable()) {
+    if (!tomcat.getConnector().getState().isAvailable() || !context.getState().isAvailable()) {
       tomcat.stop();
       tomcat.destroy();
-      throw new IllegalStateException("The HTTP port is unavailable. Choose another port.");
+      throw new IllegalStateException("Application startup failed. Check the HTTP port and database initialization logs.");
     }
     return tomcat;
   }

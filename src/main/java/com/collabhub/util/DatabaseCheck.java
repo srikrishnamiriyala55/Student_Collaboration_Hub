@@ -4,6 +4,7 @@ import java.sql.*;
 
 public final class DatabaseCheck {
   public static void main(String[] args) throws Exception {
+    Db.initialize();
     try (Connection c = Db.open();
         PreparedStatement p =
             c.prepareStatement("SELECT DATABASE(),VERSION(),(SELECT COUNT(*) FROM students)");

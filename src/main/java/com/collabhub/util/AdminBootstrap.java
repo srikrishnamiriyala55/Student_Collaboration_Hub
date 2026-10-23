@@ -12,6 +12,7 @@ public final class AdminBootstrap {
     if (console == null)
       throw new IllegalStateException(
           "Run from an interactive terminal so the password can be entered privately.");
+    Db.initialize();
     String name = Validation.text(console.readLine("Administrator name: "), "Name", 100),
         email =
             Validation.text(console.readLine("Administrator email: "), "Email", 190)

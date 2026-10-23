@@ -17,6 +17,10 @@
     <dependency><groupId>org.eclipse.jdt</groupId><artifactId>ecj</artifactId><version>3.26.0</version><scope>test</scope></dependency>
   </dependencies>
   <build>
+    <resources>
+      <resource><directory>src/main/resources</directory></resource>
+      <resource><directory>database</directory><targetPath>database</targetPath><includes><include>schema.sql</include></includes></resource>
+    </resources>
     <finalName>Student_Collaboration_Hub</finalName>
     <plugins>
       <plugin>

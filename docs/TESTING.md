@@ -6,6 +6,8 @@ Build: `mvn package`. Source compiles for Java 8; runtime verification uses inst
 
 Normal `mvn package` also runs `JspCompilationTest`, which compiles all 17 JSP pages and their fragments with Jasper without a database. The database/HTTP integration suites remain opt-in.
 
+`DatabaseInitializerTest` checks database URL parsing, safe schema names, and packaging of the non-destructive schema without connecting to MySQL. Its optional real first-run check is enabled with `COLLABHUB_BOOTSTRAP_CHECK=true`; it creates a UUID-named `collabhub_setup_check_...` schema, initializes it twice, verifies data preservation, and drops only that temporary schema in a finally block. It does not recreate student_hub_test.
+
 Explicit integration command from an interactive PowerShell terminal:
 
 ```powershell

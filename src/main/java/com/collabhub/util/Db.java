@@ -22,16 +22,24 @@ public final class Db {
 
   private Db() {}
 
-  private static String setting(String env, String key) {
+  static String setting(String env, String key) {
     String s = System.getenv(env);
     return s == null ? CONFIG.getProperty(key) : s;
   }
 
-  public static Connection open() throws SQLException {
+  static Connection connect(String url) throws SQLException {
     return DriverManager.getConnection(
-        setting("DB_URL", "db.url"),
-        setting("DB_USER", "db.user"),
-        setting("DB_PASSWORD", "db.password"));
+        url, setting("DB_USER", "db.user"), setting("DB_PASSWORD", "db.password"));
+  }
+
+  public static void initialize() throws Exception {
+    if (!"false".equalsIgnoreCase(setting("DB_INITIALIZE", "db.initialize"))) {
+      DatabaseInitializer.initialize(setting("DB_URL", "db.url"));
+    }
+  }
+
+  public static Connection open() throws SQLException {
+    return connect(setting("DB_URL", "db.url"));
   }
 
   public interface Work<T> {
